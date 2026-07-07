@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Para Andy 💜</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,600&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --blush:#FFEAF4;
+    --blush-deep:#FBD9EA;
+    --pink:#F2A6C6;
+    --hotpink:#E0729E;
+    --purple:#7B4397;
+    --deep-purple:#4A2559;
+    --lavender:#C9A8E0;
+    --cream:#FFF8FB;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{
+    height:100%;
+    font-family:'Quicksand', sans-serif;
+    background:var(--cream);
+    color:var(--deep-purple);
+    overflow-x:hidden;
+  }
+  .screen{
+    min-height:100vh;
+    width:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+  }
+  /* ---------- petal fall (global, always behind content) ---------- */
+  #petal-canvas{
+    position:fixed;
+    inset:0;
+    width:100%;
+    height:100%;
+    pointer-events:none;
+    z-index:1;
+  }
+
+  /* ---------- ENTRY SCREEN ---------- */
+  #entry{
+    background:radial-gradient(circle at 30% 20%, var(--blush-deep), var(--blush) 55%, var(--lavender) 130%);
+    z-index:5;
+    text-align:center;
+    flex-direction:column;
+    gap:28px;
+    padding:24px;
+  }
+  #entry .eyebrow{
+    font-size:0.85rem;
+    letter-spacing:0.35em;
+    text-transform:uppercase;
+    color:var(--purple);
+    font-weight:600;
+  }
+  #entry h1{
+    font-family:'Playfair Display', serif;
+    font-size:clamp(2.2rem, 7vw, 3.6rem);
+    color:var(--deep-purple);
+    font-style:italic;
+    font-weight:700;
+    line-height:1.15;
+  }
+  #entry p.sub{
+    max-width:420px;
+    font-size:1.05rem;
+    color:#6b3f7a;
+  }
+  #enter-btn{
+    margin-top:10px;
+    background:linear-gradient(135deg, var(--hotpink), var(--purple));
+    color:#fff;
+    border:none;
+    padding:16px 42px;
+    border-radius:100px;
+    font-family:'Quicksand', sans-serif;
+    font-weight:700;
+    font-size:1.05rem;
+    letter-spacing:0.03em;
+    cursor:pointer;
+    box-shadow:0 10px 30px rgba(123,67,151,0.35);
+    transition:transform .25s ease, box-shadow .25s ease;
+  }
+  #enter-btn:hover{ transform:translateY(-3px); box-shadow:0 14px 36px rgba(123,67,151,0.45); }
+  #enter-btn:focus-visible{ outline:3px solid var(--deep-purple); outline-offset:3px; }
+  .heart-mark{ font-size:1.6rem; }
+
+  /* ---------- COUNTDOWN SCREEN ---------- */
+  #countdown-screen{
+    display:none;
+    background:linear-gradient(160deg, var(--deep-purple) 0%, var(--purple) 55%, var(--hotpink) 130%);
+    color:var(--cream);
+    flex-direction:column;
+    gap:26px;
+    text-align:center;
+    padding:24px;
+    z-index:5;
+  }
+  #countdown-screen .eyebrow{
+    letter-spacing:0.35em;
+    text-transform:uppercase;
+    font-size:0.8rem;
+    color:var(--lavender);
+    font-weight:600;
+  }
+  #countdown-screen h2{
+    font-family:'Playfair Display', serif;
+    font-style:italic;
+    font-size:clamp(1.6rem, 5vw, 2.6rem);
+    max-width:600px;
+  }
+  #timer{
+    display:flex;
+    gap:clamp(10px, 3vw, 28px);
+    flex-wrap:wrap;
+    justify-content:center;
+  }
+  .time-block{
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.25);
+    backdrop-filter:blur(6px);
+    border-radius:18px;
+    padding:18px clamp(14px,3vw,26px);
+    min-width:80px;
+  }
+  .time-num{
+    font-family:'Playfair Display', serif;
+    font-size:clamp(1.8rem, 6vw, 3rem);
+    font-weight:700;
+    line-height:1;
+  }
+  .time-label{
+    font-size:0.7rem;
+    letter-spacing:0.2em;
+    text-transform:uppercase;
+    color:var(--lavender);
+    margin-top:6px;
+  }
+  #countdown-screen .date-note{
+    font-size:0.95rem;
+    color:var(--blush-deep);
+    opacity:0.85;
+  }
+
+  /* ---------- REVEAL SCREEN ---------- */
+  #reveal{
+    display:none;
+    background:linear-gradient(180deg, var(--blush) 0%, var(--cream) 40%);
+    flex-direction:column;
+    align-items:center;
+    padding:70px 20px 40px;
+    z-index:5;
+    gap:70px;
+  }
+  .reveal-inner{ width:100%; max-width:1100px; }
+
+  .hero-row{
+    display:flex;
+    align-items:center;
+    gap:50px;
+    flex-wrap:wrap;
+    justify-content:center;
+  }
+  .letter{
+    flex:1 1 420px;
+    min-width:280px;
+  }
+  .letter .eyebrow{
+    letter-spacing:0.3em;
+    text-transform:uppercase;
+    font-size:0.78rem;
+    color:var(--hotpink);
+    font-weight:700;
+  }
+  .letter h2{
+    font-family:'Playfair Display', serif;
+    font-style:italic;
+    font-size:clamp(2rem, 4.5vw, 2.8rem);
+    color:var(--deep-purple);
+    margin:12px 0 22px;
+    line-height:1.2;
+  }
+  .letter p{
+    font-size:1.05rem;
+    line-height:1.8;
+    color:#5a3566;
+    margin-bottom:16px;
+  }
+  .signature{
+    font-family:'Playfair Display', serif;
+    font-style:italic;
+    font-size:1.3rem;
+    color:var(--hotpink);
+    margin-top:18px;
+  }
+
+  .tree-wrap{
+    flex:0 1 300px;
+    display:flex;
+    justify-content:center;
+  }
+  .tree-wrap svg{ width:100%; max-width:280px; height:auto; }
+
+  /* gallery */
+  .section-title{
+    font-family:'Playfair Display', serif;
+    font-style:italic;
+    text-align:center;
+    font-size:clamp(1.6rem, 4vw, 2.2rem);
+    color:var(--deep-purple);
+    margin-bottom:34px;
+  }
+  .gallery{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(150px, 1fr));
+    gap:16px;
+  }
+  .gallery figure{
+    margin:0;
+    aspect-ratio:1/1.1;
+    border-radius:16px;
+    overflow:hidden;
+    background:var(--blush-deep) url('') center/cover;
+    border:3px solid #fff;
+    box-shadow:0 8px 22px rgba(123,67,151,0.18);
+    position:relative;
+  }
+  .gallery img{
+    width:100%; height:100%; object-fit:cover; display:block;
+  }
+  .gallery figure::after{
+    content:attr(data-label);
+    position:absolute;
+    inset:auto 0 0 0;
+    font-size:0.65rem;
+    text-align:center;
+    color:var(--purple);
+    background:rgba(255,255,255,0.75);
+    padding:3px 0;
+  }
+
+  /* music toggle */
+  #music-toggle{
+    position:fixed;
+    bottom:22px;
+    right:22px;
+    z-index:20;
+    width:56px;
+    height:56px;
+    border-radius:50%;
+    border:none;
+    background:linear-gradient(135deg, var(--hotpink), var(--purple));
+    color:#fff;
+    font-size:1.4rem;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    box-shadow:0 8px 22px rgba(123,67,151,0.35);
+    cursor:pointer;
+  }
+  #music-toggle:focus-visible{ outline:3px solid var(--deep-purple); outline-offset:3px; }
+
+  footer.final{
+    text-align:center;
+    padding-top:10px;
+    color:var(--purple);
+    font-size:0.9rem;
+  }
+
+  @media (max-width:640px){
+    .hero-row{ flex-direction:column-reverse; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    #petal-canvas{ display:none; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="petal-canvas"></canvas>
+
+<!-- ENTRY -->
+<section class="screen" id="entry">
+  <div class="eyebrow">Una sorpresa para ti</div>
+  <h1>Andy, mi reina<br>abre con cuidado 💌</h1>
+  <p class="sub">Hay algo esperándote justo después de esto. Toca el corazón cuando estés lista.</p>
+  <button id="enter-btn" onclick="startExperience()"><span class="heart-mark">💗</span> Toca aquí, mi niña</button>
+</section>
+
+<!-- COUNTDOWN -->
+<section class="screen" id="countdown-screen">
+  <div class="eyebrow">Faltan solo</div>
+  <h2>Para celebrar 3 años a tu lado, mi Andy</h2>
+  <div id="timer">
+    <div class="time-block"><div class="time-num" id="d">00</div><div class="time-label">días</div></div>
+    <div class="time-block"><div class="time-num" id="h">00</div><div class="time-label">horas</div></div>
+    <div class="time-block"><div class="time-num" id="m">00</div><div class="time-label">min</div></div>
+    <div class="time-block"><div class="time-num" id="s">00</div><div class="time-label">seg</div></div>
+  </div>
+  <div class="date-note">8 de julio · nuestro aniversario</div>
+</section>
+
+<!-- REVEAL -->
+<section class="screen" id="reveal">
+  <div class="reveal-inner">
+    <div class="hero-row">
+      <div class="letter">
+        <div class="eyebrow">3 años juntos</div>
+        <h2>Feliz aniversario,<br>mi reina</h2>
+        <p>Mi amor, hoy celebramos tres maravillosos años juntos.</p>
+        <p>Doy gracias a Dios por haberte puesto en mi camino y por cada momento compartido.</p>
+        <p>Le pido que continúe bendiciendo nuestro amor, fortalezca nuestra unión, guíe nuestros pasos y nos permita seguir construyendo un hermoso futuro juntos.</p>
+        <p class="signature">Te amo muchísimo. 💜</p>
+      </div>
+      <div class="tree-wrap">
+        <svg viewBox="0 0 240 320" xmlns="http://www.w3.org/2000/svg" aria-label="Árbol de gerberas">
+          <!-- trunk -->
+          <path d="M120 320 C118 260 122 220 120 180" stroke="#8a5a3c" stroke-width="10" fill="none" stroke-linecap="round"/>
+          <path d="M120 230 C100 215 85 205 70 200" stroke="#8a5a3c" stroke-width="6" fill="none" stroke-linecap="round"/>
+          <path d="M120 210 C140 195 155 185 170 178" stroke="#8a5a3c" stroke-width="6" fill="none" stroke-linecap="round"/>
+          <path d="M120 260 C138 250 150 245 162 242" stroke="#8a5a3c" stroke-width="5" fill="none" stroke-linecap="round"/>
+          <path d="M120 260 C102 252 90 248 78 246" stroke="#8a5a3c" stroke-width="5" fill="none" stroke-linecap="round"/>
+          <!-- foliage cluster of gerberas -->
+          <g id="tree-gerberas">
+            <use href="#gerbera-tpl" x="60" y="150" transform="scale(0.55)" style="transform-origin:60px 150px"/>
+          </g>
+        </svg>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-title">Nuestros momentos</div>
+      <div class="gallery" id="gallery"></div>
+    </div>
+
+    <footer class="final">8 · 07 · 2026 &nbsp;·&nbsp; Andy &amp; yo &nbsp;·&nbsp; 3 años 💗</footer>
+  </div>
+</section>
+
+<button id="music-toggle" onclick="toggleMusic()" aria-label="Reproducir música" title="Música">🎵</button>
+<audio id="bg-music" src="musica.mp3" loop></audio>
+
+<!-- hidden template for a single gerbera, reused everywhere -->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <g id="gerbera-tpl">
+      <g>
+        <ellipse cx="0" cy="-24" rx="7" ry="20" fill="#E0729E"/>
+        <ellipse cx="0" cy="-24" rx="7" ry="20" fill="#E0729E" transform="rotate(30)"/>
+        <ellipse cx="0" cy="-24" rx="7" ry="20" fill="#F2A6C6" transform="rotate(60)"/>
+        <ellipse cx="0" cy="-24" rx="7" ry="20" fill="#E0729E" transform="rotate(90)"/>
+        <ellipse cx="0" cy="-24" rx="7" ry="20" fill="#F2A6C6" transform="rotate(120)"/>
+        <ellipse cx="0" cy="-24" rx="7" ry="20" fill="#E0729E" transform="rotate(150)"/>
+        <ellipse cx="0" cy="-24" rx="7" ry="20" fill="#F2A6C6" transform="rotate(180)"/>
+        <ellipse cx="0" cy="-24" rx="7" ry="20" fill="#E0729E" transform="rotate(210)"/>
+        <ellipse cx="0" cy="-24" rx="7" ry="20" fill="#F2A6C6" transform="rotate(240)"/>
+        <ellipse cx="0" cy="-24" rx="7" ry="20" fill="#E0729E" transform="rotate(270)"/>
+        <ellipse cx="0" cy="-24" rx="7" ry="20" fill="#F2A6C6" transform="rotate(300)"/>
+        <ellipse cx="0" cy="-24" rx="7" ry="20" fill="#E0729E" transform="rotate(330)"/>
+        <circle cx="0" cy="0" r="10" fill="#7B4397"/>
+      </g>
+    </g>
+  </defs>
+</svg>
+
+<script>
+/* ============ CONFIG ============ */
+// Fecha y hora objetivo del aniversario. Ajusta la hora si quieren otra distinta a medianoche.
+const TARGET_DATE = new Date("2026-07-08T00:00:00");
+
+// Rutas de tus 10 fotos y tu música. Coloca los archivos junto a este HTML
+// dentro de una carpeta llamada "fotos" (fotos/1.jpg ... fotos/10.jpg)
+// y un archivo de música llamado musica.mp3 en la misma carpeta que este HTML.
+const PHOTOS = Array.from({length:10}, (_,i)=> `fotos/${i+1}.jpg`);
+
+/* ============ ENTRY -> COUNTDOWN ============ */
+function startExperience(){
+  document.getElementById('entry').style.display = 'none';
+  const cd = document.getElementById('countdown-screen');
+  cd.style.display = 'flex';
+  runCountdown();
+}
+
+function runCountdown(){
+  function tick(){
+    const now = new Date();
+    let diff = TARGET_DATE - now;
+    if(diff <= 0){
+      document.getElementById('countdown-screen').style.display = 'none';
+      showReveal();
+      return;
+    }
+    const d = Math.floor(diff / 86400000); diff -= d*86400000;
+    const h = Math.floor(diff / 3600000); diff -= h*3600000;
+    const m = Math.floor(diff / 60000); diff -= m*60000;
+    const s = Math.floor(diff / 1000);
+    document.getElementById('d').textContent = String(d).padStart(2,'0');
+    document.getElementById('h').textContent = String(h).padStart(2,'0');
+    document.getElementById('m').textContent = String(m).padStart(2,'0');
+    document.getElementById('s').textContent = String(s).padStart(2,'0');
+    requestAnimationFrame(()=> setTimeout(tick, 250));
+  }
+  tick();
+}
+
+/* ============ REVEAL ============ */
+function showReveal(){
+  const reveal = document.getElementById('reveal');
+  reveal.style.display = 'flex';
+  buildGallery();
+  // intenta iniciar música automáticamente; si el navegador la bloquea,
+  // el corazón del botón de música permite iniciarla manualmente.
+  const audio = document.getElementById('bg-music');
+  audio.play().catch(()=>{ /* el usuario deberá tocar el botón de música */ });
+}
+
+function buildGallery(){
+  const gallery = document.getElementById('gallery');
+  PHOTOS.forEach((src, i)=>{
+    const fig = document.createElement('figure');
+    fig.dataset.label = `Momento ${i+1}`;
+    const img = document.createElement('img');
+    img.src = src;
+    img.alt = `Foto de Andy y yo, momento ${i+1}`;
+    img.onerror = ()=>{ fig.style.background = 'linear-gradient(135deg,#F2A6C6,#C9A8E0)'; img.remove(); };
+    fig.appendChild(img);
+    gallery.appendChild(fig);
+  });
+}
+
+/* ============ MUSIC TOGGLE ============ */
+function toggleMusic(){
+  const audio = document.getElementById('bg-music');
+  if(audio.paused){ audio.play().catch(()=>{}); }
+  else{ audio.pause(); }
+}
+
+/* ============ FALLING GERBERAS (canvas) ============ */
+const canvas = document.getElementById('petal-canvas');
+const ctx = canvas.getContext('2d');
+let W, H;
+function resize(){ W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+window.addEventListener('resize', resize);
+resize();
+
+const COLORS = ['#E0729E', '#F2A6C6', '#C9A8E0', '#7B4397'];
+const NUM_PETALS = 26;
+
+function makeGerbera(){
+  return {
+    x: Math.random()*W,
+    y: Math.random()*-H,
+    size: 10 + Math.random()*10,
+    speed: 0.4 + Math.random()*0.8,
+    drift: (Math.random()-0.5)*0.6,
+    rot: Math.random()*Math.PI*2,
+    rotSpeed: (Math.random()-0.5)*0.02,
+    petalColor: COLORS[Math.floor(Math.random()*COLORS.length)],
+    petalColor2: COLORS[Math.floor(Math.random()*COLORS.length)],
+    sway: Math.random()*Math.PI*2
+  };
+}
+
+let gerberas = Array.from({length:NUM_PETALS}, makeGerbera);
+
+function drawGerbera(g){
+  ctx.save();
+  ctx.translate(g.x, g.y);
+  ctx.rotate(g.rot);
+  const petalLen = g.size;
+  for(let i=0;i<12;i++){
+    ctx.save();
+    ctx.rotate((Math.PI*2/12)*i);
+    ctx.fillStyle = i % 2 === 0 ? g.petalColor : g.petalColor2;
+    ctx.beginPath();
+    ctx.ellipse(0, -petalLen*0.6, petalLen*0.22, petalLen*0.6, 0, 0, Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+  }
+  ctx.fillStyle = '#7B4397';
+  ctx.beginPath();
+  ctx.arc(0,0, petalLen*0.28, 0, Math.PI*2);
+  ctx.fill();
+  ctx.restore();
+}
+
+function animate(){
+  ctx.clearRect(0,0,W,H);
+  gerberas.forEach(g=>{
+    g.y += g.speed;
+    g.sway += 0.01;
+    g.x += Math.sin(g.sway)*0.4 + g.drift*0.2;
+    g.rot += g.rotSpeed;
+    if(g.y > H + 30){
+      Object.assign(g, makeGerbera(), {y: -30});
+    }
+    drawGerbera(g);
+  });
+  requestAnimationFrame(animate);
+}
+if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+  animate();
+}
+</script>
+</body>
+</html>
